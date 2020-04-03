@@ -5,66 +5,79 @@
  */
 package com.devs.ticketapp.controller;
 
-import com.devs.ticketapp.dao.ColaModel;
-import com.devs.ticketapp.dao.EmpresaModel;
-import com.devs.ticketapp.dao.TipoEmpresaModel;
-import com.devs.ticketapp.dao.UserModel;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- *
- * @author azus
- */
+import com.devs.ticketapp.exception.BadRequestException;
+import com.devs.ticketapp.exception.ResourceNotFoundException;
+import com.devs.ticketapp.model.TipoEmpresa;
+import com.devs.ticketapp.repository.TipoEmpresaRepository;
+
 @RestController
+@RequestMapping("/tipoempresa")
 public class TipoEmpresaController {
      
+	@Autowired
+    private TipoEmpresaRepository tipoEmpresaRepository;
     
-    
-    @RequestMapping(value="/tipoempresa/list", method=RequestMethod.GET)
-    public String obtenerTotalTipoEmpresa(){
-        TipoEmpresaModel model= new TipoEmpresaModel();
-        String respuesta = model.obtenerTotalTipoEmpresas();
-        return respuesta;
+    @GetMapping()
+    public List<TipoEmpresa> obtenerTotalTipoEmpresa(){
+        return tipoEmpresaRepository.findAll();
     }
     
-
-    
-    @RequestMapping(value="/tipoempresa", method=RequestMethod.POST)
-    public String obtenerTipoEmpresaById(@RequestBody String jSonRequest){
-        TipoEmpresaModel model= new TipoEmpresaModel();
-        String respuesta = model.obtenerTipoEmpresaByID(jSonRequest);
-        return respuesta;
+    @GetMapping(value="/{idTipoEmpresa}")
+    public TipoEmpresa obtenerTipoEmpresaById(@PathVariable Integer idTipoEmpresa){
+        if(!tipoEmpresaRepository.existsById(idTipoEmpresa)) {
+        	throw new ResourceNotFoundException("No se ha encontrado Tipo empresa con ID: " + idTipoEmpresa);
+        }
+        
+        return tipoEmpresaRepository.findById(idTipoEmpresa).get();
     }
      
-    @RequestMapping(value="/tipoempresa/add", method=RequestMethod.POST)
-    public String insertarTipoEmpresa(@RequestBody String jSonRequest){
-        TipoEmpresaModel model= new TipoEmpresaModel();
-        String respuesta = model.insertarTipoEmpresa(jSonRequest);
-        return respuesta;
-    }
-    
+    @PostMapping()
+    public TipoEmpresa insertarTipoEmpresa(@RequestBody TipoEmpresa newTipoEmpresa){
+    	
+    	if(newTipoEmpresa == null) {
+    		throw new BadRequestException("Solicitud inválida");
+    	}
+    	
+    	return tipoEmpresaRepository.save(newTipoEmpresa);
+    } 
   
-    @RequestMapping(value="/tipoempresa/edit", method=RequestMethod.PUT)
-    public String modificarTipoEmpresa(@RequestBody String jSonRequest){
-        TipoEmpresaModel model= new TipoEmpresaModel();
-        String respuesta = model.modificarTipoEmpresa(jSonRequest);
-        return respuesta;
+    @PutMapping(value = "/{idTipoEmpresa}")
+    public TipoEmpresa modificarTipoEmpresa(@PathVariable Integer idTipoEmpresa, @RequestBody TipoEmpresa tipoEmpresa){
+    	if(tipoEmpresa == null) {
+    		throw new BadRequestException("Solicitud inválida para Tipo empresa con ID " + idTipoEmpresa);
+    	}
+    	
+        if(!tipoEmpresaRepository.existsById(idTipoEmpresa)) {
+        	throw new ResourceNotFoundException("TipoEmpresa no encontrada con ID " + idTipoEmpresa);
+        }
+        
+        TipoEmpresa tipoEmpresaToUpdate = tipoEmpresaRepository.findById(idTipoEmpresa).get();
+        tipoEmpresaToUpdate.setTipo(tipoEmpresa.getTipo());
+        tipoEmpresaToUpdate.setDescripcion(tipoEmpresa.getDescripcion());
+        tipoEmpresaToUpdate.setImagen(tipoEmpresa.getImagen());
+        return tipoEmpresaRepository.save(tipoEmpresaToUpdate);
     }
     
-    
-    @RequestMapping(value="/tipoempresa/delete", method=RequestMethod.DELETE)
-    public String eliminarTipoEmpresa(@RequestBody String jSonRequest){
-        TipoEmpresaModel model= new TipoEmpresaModel();
-        String respuesta = model.eliminarTipoEmpresa(jSonRequest);
-        return respuesta;
+    @DeleteMapping(value = "/{idTipoEmpresa}")
+    public ResponseEntity<?> eliminarTipoEmpresa(@PathVariable Integer idTipoEmpresa){
+    	if(!tipoEmpresaRepository.existsById(idTipoEmpresa)) {
+            throw new ResourceNotFoundException("Tipo Empresa no encontrada con ID " + idTipoEmpresa);
+        }
+
+    	tipoEmpresaRepository.deleteById(idTipoEmpresa);
+        return ResponseEntity.ok().build();
     }
 }

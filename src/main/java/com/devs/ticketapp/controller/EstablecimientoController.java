@@ -1,51 +1,84 @@
 package com.devs.ticketapp.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
-import com.devs.ticketapp.dao.EstablecimientoModel;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.devs.ticketapp.exception.BadRequestException;
+import com.devs.ticketapp.exception.ResourceNotFoundException;
+import com.devs.ticketapp.model.Establecimiento;
+import com.devs.ticketapp.repository.EstablecimientoRepository;
 
 @RestController
+@RequestMapping("/establecimiento")
 public class EstablecimientoController {
-    @RequestMapping(value="/establecimiento/list", method=RequestMethod.GET)
-    public String obtenerTotalColas(){
-        EstablecimientoModel model= new EstablecimientoModel();
-        String respuesta = model.obtenerTotalEstablecimientos();
-        return respuesta;
-    }
+	
+	@Autowired
+    private EstablecimientoRepository establecimientoRepository;
+	
+    @GetMapping()
+    public List<Establecimiento> obtenerTotalColas(){
+        return establecimientoRepository.findAll();
+    }    
     
-
-    
-    @RequestMapping(value="/establecimiento", method=RequestMethod.POST)
-    public String obtenerColaById(@RequestBody String jSonRequest){
-        EstablecimientoModel model= new EstablecimientoModel();
-        String respuesta = model.obtenerEstablecimientoID(jSonRequest);
-        return respuesta;
+    @GetMapping(value="/{idEstablecimiento}")
+    public Establecimiento obtenerColaById(@PathVariable Integer idEstablecimiento){
+    	if(!establecimientoRepository.existsById(idEstablecimiento)) {
+        	throw new ResourceNotFoundException("No se ha encontrado Establecimiento con ID: " + idEstablecimiento);
+        }
+    	
+    	return establecimientoRepository.findById(idEstablecimiento).get();
     }
      
-    @RequestMapping(value="/establecimiento/add", method=RequestMethod.POST)
-    public String insertarCola(@RequestBody String jSonRequest){
-        EstablecimientoModel model= new EstablecimientoModel();
-        String respuesta = model.insertarEstablecimiento(jSonRequest);
-        return respuesta;
+    @PostMapping()
+    public Establecimiento insertarCola(@RequestBody Establecimiento establecimiento){
+        if(establecimiento == null) {
+        	throw new BadRequestException("Solicitud inválida");
+        }
+        
+        return establecimientoRepository.save(establecimiento);
+    }
+        
+    @PutMapping(value="/{idEstablecimiento}")
+    public Establecimiento modificarCola(@PathVariable Integer idEstablecimiento, @RequestBody Establecimiento newEstablecmiento){
+    	if(newEstablecmiento == null) {
+    		throw new BadRequestException("Solicitud inválida para Establecimiento con ID " + idEstablecimiento);
+    	}
+    	
+    	if(!establecimientoRepository.existsById(idEstablecimiento)) {
+        	throw new ResourceNotFoundException("No se ha encontrado Establecimiento con ID: " + idEstablecimiento);
+        }
+    	
+    	Establecimiento establecimientoToUpdate = establecimientoRepository.findById(idEstablecimiento).get();
+    	establecimientoToUpdate.setNombre(newEstablecmiento.getNombre());
+    	establecimientoToUpdate.setDireccion1(newEstablecmiento.getDireccion1());
+    	establecimientoToUpdate.setDireccion2(newEstablecmiento.getDireccion2());
+    	establecimientoToUpdate.setLatitud(newEstablecmiento.getLatitud());
+    	establecimientoToUpdate.setLongitud(newEstablecmiento.getLongitud());
+    	establecimientoToUpdate.setDuracionvenmin(newEstablecmiento.getDuracionvenmin());
+    	establecimientoToUpdate.setIdEmpresa(newEstablecmiento.getIdEmpresa());
+    	
+    	return establecimientoRepository.save(establecimientoToUpdate);
     }
     
     
-    @RequestMapping(value="/establecimiento/edit", method=RequestMethod.PUT)
-    public String modificarCola(@RequestBody String jSonRequest){
-        EstablecimientoModel model= new EstablecimientoModel();
-        String respuesta = model.modificarEstablecimiento(jSonRequest);
-        return respuesta;
-    }
-    
-    
-    @RequestMapping(value="/establecimiento/delete", method=RequestMethod.DELETE)
-    public String eliminarCola(@RequestBody String jSonRequest){
-        EstablecimientoModel model= new EstablecimientoModel();
-        String respuesta = model.eliminarEstablecimiento(jSonRequest);
-        return respuesta;
+    @DeleteMapping(value="/{idEstablecimiento}")
+    public ResponseEntity<?> eliminarCola(@PathVariable Integer idEstablecimiento){
+    	if(!establecimientoRepository.existsById(idEstablecimiento)) {
+        	throw new ResourceNotFoundException("No se ha encontrado Establecimiento con ID: " + idEstablecimiento);
+        }
+    	
+    	establecimientoRepository.deleteById(idEstablecimiento);
+    	
+    	return ResponseEntity.ok().build();
     }
 }

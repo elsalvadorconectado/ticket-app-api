@@ -5,67 +5,82 @@
  */
 package com.devs.ticketapp.controller;
 
-import com.devs.ticketapp.dao.EmpresaModel;
-import com.devs.ticketapp.dao.UserModel;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- *
- * @author azus
- */
+import com.devs.ticketapp.exception.BadRequestException;
+import com.devs.ticketapp.exception.ResourceNotFoundException;
+import com.devs.ticketapp.model.Empresa;
+import com.devs.ticketapp.repository.EmpresaRepository;
+
 @RestController
+@RequestMapping("/empresa")
 public class EmpresaController {
      
+	@Autowired
+    private EmpresaRepository empresaRepository;
     
-    
-    @RequestMapping(value="/company/list", method=RequestMethod.GET)
-    public String obtenerTotalEmpresas(){
-        EmpresaModel model= new EmpresaModel();
-        String respuesta = model.obtenerTotalEmpresas();
-        return respuesta;
+    @GetMapping()
+    public List<Empresa> obtenerTotalEmpresas(){
+        return empresaRepository.findAll();
     }
-    
-
-    
-    @RequestMapping(value="/company", method=RequestMethod.POST)
-    public String obtenerEmpresaById(@RequestBody String jSonRequest){
-        EmpresaModel model= new EmpresaModel();
-        String respuesta = model.obtenerEmpresaByID(jSonRequest);
-        return respuesta;
+        
+    @GetMapping(value="/{idEmpresa}")
+    public Empresa obtenerEmpresaById(@PathVariable Integer idEmpresa){
+        if(!empresaRepository.existsById(idEmpresa)) {
+        	throw new ResourceNotFoundException("No se ha encontrado Empresa con ID: " + idEmpresa);
+        }
+        
+        return empresaRepository.findById(idEmpresa).get();
     }
      
-    @RequestMapping(value="/company/add", method=RequestMethod.POST)
-    public String insertarEmpresa(@RequestBody String jSonRequest){
-        EmpresaModel model= new EmpresaModel();
-        String respuesta = model.insertarEmpresa(jSonRequest);
-        return respuesta;
+    @PostMapping()
+    public Empresa insertarEmpresa(@RequestBody Empresa empresa){
+        if(empresa == null) {
+        	throw new BadRequestException("Solicitud inválida");
+        }
+        
+        return empresaRepository.save(empresa);
+    }
+  
+    @PutMapping(value="/{idEmpresa}")
+    public Empresa modificarEmpresa(@PathVariable Integer idEmpresa, @RequestBody Empresa newEmpresa){
+    	if(newEmpresa == null) {
+    		throw new BadRequestException("Solicitud inválida para Empresa con ID " + idEmpresa);
+    	}
+    	
+        if(!empresaRepository.existsById(idEmpresa)) {
+        	throw new ResourceNotFoundException("Empresa no encontrada con ID " + idEmpresa);
+        }
+        
+        Empresa empresaToUpdate = empresaRepository.findById(idEmpresa).get();
+        empresaToUpdate.setIdTipoEmpresa(newEmpresa.getIdTipoEmpresa());
+        empresaToUpdate.setNombre(newEmpresa.getNombre());
+        empresaToUpdate.setNombreCorto(newEmpresa.getNombreCorto());
+        empresaToUpdate.setNit(newEmpresa.getNit());
+        
+        return empresaRepository.save(empresaToUpdate);
     }
     
     
-     /* Metodo que se utiliza para modificar un usuario especifico en la BD  
-        @Param JsonRequest [{"idusuario" : 20000,"nombre":"WebServicePrueba","telefono":"1234567", "notificacion":"SMS"}]
-    */   
-    @RequestMapping(value="/company/edit", method=RequestMethod.PUT)
-    public String modificarEmpresa(@RequestBody String jSonRequest){
-        EmpresaModel model= new EmpresaModel();
-        String respuesta = model.modificarEmpresa(jSonRequest);
-        return respuesta;
-    }
-    
-    
-    @RequestMapping(value="/company/delete", method=RequestMethod.DELETE)
-    public String eliminarEmpresa(@RequestBody String jSonRequest){
-        EmpresaModel model= new EmpresaModel();
-        String respuesta = model.eliminarEmpresa(jSonRequest);
-        return respuesta;
+    @DeleteMapping(value="/{idEmpresa}")
+    public ResponseEntity<?> eliminarEmpresa(@PathVariable Integer idEmpresa){
+    	if(!empresaRepository.existsById(idEmpresa)) {
+        	throw new ResourceNotFoundException("No se ha encontrado Empresa con ID: " + idEmpresa);
+        }
+    	
+    	empresaRepository.deleteById(idEmpresa);
+    	
+    	return ResponseEntity.ok().build();
     }
 }
