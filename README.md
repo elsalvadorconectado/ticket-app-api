@@ -1,5 +1,15 @@
 # TicketQueue API
-Proyecto que sera utilizado para realizar cada una de las transacciones del sistema de colas con ticket virtual
+Proyecto que sera utilizado para realizar cada una de las transacciones del sistema de colas con ticket virtual.
+
+### Variables de entorno requeridas
+```sh
+$ DB_HOST=Host
+$ DB_PORT=Puerto
+$ DB_NAME=Nombre de la base de datos
+$ DB_USERNAME=Usuario
+$ DB_PASSWORD=Contraseña
+```
+
 
 ### Documentación de la API
 
