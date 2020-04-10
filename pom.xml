@@ -10,9 +10,12 @@
     </parent>
     <groupId>com.devs</groupId>
     <artifactId>ticketapp</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>ticketapp</name>
     <description>Aplicacion para el manejo de colas</description>
+
+
+    <packaging>${packaging.type}</packaging>
 
     <properties>
         <java.version>1.8</java.version>
@@ -24,7 +27,13 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         
-        
+ <!-- https://mvnrepository.com/artifact/com.google.collections/google-collections -->
+<dependency>
+    <groupId>com.google.collections</groupId>
+    <artifactId>google-collections</artifactId>
+    <version>1.0-rc2</version>
+</dependency>
+       
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -85,14 +94,30 @@
             <version>1.18.6</version>
             <scope>provided</scope>
         </dependency>
+        
+        <!--
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-
-                
+        -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
             <scope>provided</scope>
         </dependency>
+        
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>3.1.0</version>
+    <scope>provided</scope>
+</dependency>
+ 
+    
+                      
         <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -107,6 +132,31 @@
         </dependency>
         -->
     </dependencies>
+    
+    <profiles>
+       <profile>
+           <id>jar</id>
+           <properties>
+               <packaging.type>jar</packaging.type>
+               <spring.profiles.active>dev</spring.profiles.active>
+           </properties>
+       </profile>
+       <profile>
+           <id>war</id>
+           <properties>
+                <packaging.type>war</packaging.type>
+                <spring.profiles.active>ds</spring.profiles.active>
+           </properties>
+           <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+           </dependencies>
+       </profile>
+    </profiles>    
+    
     <pluginRepositories>
         <pluginRepository>
             <id>central</id>
@@ -132,17 +182,27 @@
             </snapshots>
         </repository>
     </repositories>
-    <!--
+    
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArguments>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-    -->
     
+    <!--
    <build>
         <finalName>TicketAppProject</finalName>
         <plugins> 
@@ -195,5 +255,5 @@
             </plugin>
         </plugins>
     </build>
-
+    -->
 </project>

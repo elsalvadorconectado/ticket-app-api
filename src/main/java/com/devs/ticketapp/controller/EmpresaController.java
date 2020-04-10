@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,12 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author azus
  */
+//@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class EmpresaController {
      
     
     
-    @RequestMapping(value="/company/list", method=RequestMethod.GET)
+    @RequestMapping(value="/empresa/list", method=RequestMethod.GET)
     public String obtenerTotalEmpresas(){
         EmpresaModel model= new EmpresaModel();
         String respuesta = model.obtenerTotalEmpresas();
@@ -36,14 +38,14 @@ public class EmpresaController {
     
 
     
-    @RequestMapping(value="/company", method=RequestMethod.POST)
+    @RequestMapping(value="/empresa", method=RequestMethod.POST)
     public String obtenerEmpresaById(@RequestBody String jSonRequest){
         EmpresaModel model= new EmpresaModel();
         String respuesta = model.obtenerEmpresaByID(jSonRequest);
         return respuesta;
     }
      
-    @RequestMapping(value="/company/add", method=RequestMethod.POST)
+    @RequestMapping(value="/empresa/add", method=RequestMethod.POST)
     public String insertarEmpresa(@RequestBody String jSonRequest){
         EmpresaModel model= new EmpresaModel();
         String respuesta = model.insertarEmpresa(jSonRequest);
@@ -54,7 +56,7 @@ public class EmpresaController {
      /* Metodo que se utiliza para modificar un usuario especifico en la BD  
         @Param JsonRequest [{"idusuario" : 20000,"nombre":"WebServicePrueba","telefono":"1234567", "notificacion":"SMS"}]
     */   
-    @RequestMapping(value="/company/edit", method=RequestMethod.PUT)
+    @RequestMapping(value="/empresa/edit", method=RequestMethod.PUT)
     public String modificarEmpresa(@RequestBody String jSonRequest){
         EmpresaModel model= new EmpresaModel();
         String respuesta = model.modificarEmpresa(jSonRequest);
@@ -62,7 +64,7 @@ public class EmpresaController {
     }
     
     
-    @RequestMapping(value="/company/delete", method=RequestMethod.DELETE)
+    @RequestMapping(value="/empresa/delete", method=RequestMethod.DELETE)
     public String eliminarEmpresa(@RequestBody String jSonRequest){
         EmpresaModel model= new EmpresaModel();
         String respuesta = model.eliminarEmpresa(jSonRequest);

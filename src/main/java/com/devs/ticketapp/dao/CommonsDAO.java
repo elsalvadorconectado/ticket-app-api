@@ -28,7 +28,7 @@ public abstract class CommonsDAO {
     
     /* Se agregan todos los codigos y mensajes que se van a retornar*/
    
-    private String url= "jdbc:postgresql://bd.idea4.quenecesito.org:1003/ticketapp";
+    private String url= "jdbc:postgresql://bd.idea4.quenecesito.org:1003/ticketapptest";
    
     private String user="ticketuser";
     
