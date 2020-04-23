@@ -42,4 +42,11 @@ public class AppController {
         String respuesta = model.obtenerTotalEmpresasByIdTipo(tipoempresa);
         return respuesta;
     }
+
+    @RequestMapping(value = "/app/sucursales", method = RequestMethod.GET)
+    public String obtenerTotalSucursalesByIdEmpresa(@RequestParam String idempresa){
+        AppModel model = new AppModel();
+        String respuesta = model.obtenerTotalSucursalesByIdTipo(idempresa);
+        return respuesta;
+    }
 }
