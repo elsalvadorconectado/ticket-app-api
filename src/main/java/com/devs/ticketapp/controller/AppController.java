@@ -44,9 +44,9 @@ public class AppController {
     }
 
     @RequestMapping(value = "/app/sucursales", method = RequestMethod.GET)
-    public String obtenerTotalSucursalesByIdEmpresa(@RequestParam String idempresa){
+    public String obtenerTotalSucursalesByIdEmpresa(@RequestParam String empresa){
         AppModel model = new AppModel();
-        String respuesta = model.obtenerTotalSucursalesByIdTipo(idempresa);
+        String respuesta = model.obtenerTotalSucursalesByIdTipo(empresa);
         return respuesta;
     }
 }

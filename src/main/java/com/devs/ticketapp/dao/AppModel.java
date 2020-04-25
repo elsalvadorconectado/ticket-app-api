@@ -112,8 +112,8 @@ public class AppModel extends CommonsDAO{
                 "    json_agg(\n" +
                 "        json_build_object(\n" +
                 "            'id', e.id_establecimiento ,\n" +
-                "            'idempresa', e.id_empresa ,\n" +
-                "            'nomestablecimiento', e.nombre_establecimiento, \n" +
+                "            'empresa', e.id_empresa ,\n" +
+                "            'nombre', e.nombre_establecimiento, \n" +
                 "            'direccion', e.direccion1\n" +
                 "        )\n" +
                 "    ) as resultado\n" +
